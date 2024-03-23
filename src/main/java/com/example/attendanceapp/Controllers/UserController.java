@@ -32,10 +32,11 @@ public class UserController {
         User user = new User();
         this.passwordEncoder = new BCryptPasswordEncoder();
         String encodedPasswd = passwordEncoder.encode(userBody.getPassword());
-        
+
         user.setName(userBody.getName());
         user.setEmail(userBody.getEmail());
         user.setAddress(userBody.getAddress());
+        user.setEmployeeId(userBody.getEmployeeId());
         user.setPassword(encodedPasswd);
         userRepository.save(user);
 
