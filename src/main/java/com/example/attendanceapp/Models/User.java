@@ -1,9 +1,12 @@
 package com.example.attendanceapp.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User {
@@ -16,6 +19,9 @@ public class User {
     private String address;
     private String password;
     private Integer employeeId;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Attendance attendance;
 
     public Integer getId(){
         return id;
