@@ -14,6 +14,9 @@ import com.example.attendanceapp.Repository.UserRepository;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 // import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 // import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,5 +47,11 @@ public class UserController {
         map.put("message", "User Added Successfully");
         return map;
     }
+    @GetMapping(path = "/users")
+    public @ResponseBody Object getAllUser() {
+        Iterable <User> users = userRepository.findAll();
+        return users;
+    }
+    
     
 }
