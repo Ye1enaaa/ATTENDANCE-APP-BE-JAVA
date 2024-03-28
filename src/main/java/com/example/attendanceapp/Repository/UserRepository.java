@@ -8,4 +8,5 @@ import com.example.attendanceapp.Models.User;
 
 public interface UserRepository extends JpaRepository<User, Integer>{
     Optional<User> findByEmployeeId(Integer employeeId);
+    Optional<User> findByEmail(String email);
 }
