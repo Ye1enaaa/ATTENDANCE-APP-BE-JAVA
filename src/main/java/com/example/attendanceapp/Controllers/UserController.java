@@ -1,8 +1,11 @@
 package com.example.attendanceapp.Controllers;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -15,11 +18,6 @@ import com.example.attendanceapp.Repository.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-
-// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-// import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Controller
@@ -35,17 +33,30 @@ public class UserController {
         User user = new User();
         this.passwordEncoder = new BCryptPasswordEncoder();
         String encodedPasswd = passwordEncoder.encode(userBody.getPassword());
+        Optional<User> findEmail = userRepository.findByEmail(userBody.getEmail());
+        Optional<User> findEmpId = userRepository.findByEmployeeId(userBody.getEmployeeId());
 
-        user.setName(userBody.getName());
-        user.setEmail(userBody.getEmail());
-        user.setAddress(userBody.getAddress());
-        user.setEmployeeId(userBody.getEmployeeId());
-        user.setPassword(encodedPasswd);
-        userRepository.save(user);
+        if (findEmail.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email Already Exists");
+        }
+        else if(findEmpId.isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee ID Number Already Exists");
+        }
+        else if(findEmail.isPresent() && findEmpId.isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email and Employee ID Number Already Exists");
+        }
+        else{
+            user.setName(userBody.getName());
+            user.setEmail(userBody.getEmail());
+            user.setAddress(userBody.getAddress());
+            user.setEmployeeId(userBody.getEmployeeId());
+            user.setPassword(encodedPasswd);
+            userRepository.save(user);
 
-        HashMap<String, String> map = new HashMap<>();
-        map.put("message", "User Added Successfully");
-        return map;
+            HashMap<String, String> map = new HashMap<>();
+            map.put("message", "User Added Successfully");
+            return map;
+        }
     }
     @GetMapping(path = "/users")
     public @ResponseBody Object getAllUser() {
