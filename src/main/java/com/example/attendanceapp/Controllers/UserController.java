@@ -39,13 +39,13 @@ public class UserController {
         if (findEmail.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email Already Exists");
         }
-        else if(findEmpId.isPresent()){
+        else if(findEmpId.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee ID Number Already Exists");
         }
-        else if(userBody.getPassword().length() < 8){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must have a minimum character of 8");
+        else if(userBody.getPassword().length() < 8) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must have 8 minimum characters");
         }
-        else{
+        else {
             user.setName(userBody.getName());
             user.setEmail(userBody.getEmail());
             user.setAddress(userBody.getAddress());
