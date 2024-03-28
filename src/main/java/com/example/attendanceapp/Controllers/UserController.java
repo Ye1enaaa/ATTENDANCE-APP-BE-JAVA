@@ -42,8 +42,8 @@ public class UserController {
         else if(findEmpId.isPresent()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee ID Number Already Exists");
         }
-        else if(findEmail.isPresent() && findEmpId.isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email and Employee ID Number Already Exists");
+        else if(userBody.getPassword().length() < 8){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must have a minimum character of 8");
         }
         else{
             user.setName(userBody.getName());
