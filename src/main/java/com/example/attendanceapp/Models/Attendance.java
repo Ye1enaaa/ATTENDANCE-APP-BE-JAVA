@@ -5,8 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+
 
 @Entity
 public class Attendance {
@@ -18,8 +18,8 @@ public class Attendance {
     private String timeIn;
     private String timeOut;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     public Long getAttendanceId(){
