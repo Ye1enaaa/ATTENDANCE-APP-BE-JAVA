@@ -1,5 +1,6 @@
 package com.example.attendanceapp.Models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,9 +15,14 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.AUTO)
 
     private Long attendanceId;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = true)
     private String timeIn;
+    @Column(nullable = true)
     private String timeOut;
+    @Column(nullable = false, name = "date")
+    private String daTe;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -52,6 +58,14 @@ public class Attendance {
 
     public void setTimeOut(String timeOut){
         this.timeOut = timeOut;
+    }
+
+    public String getDate(){
+        return daTe;
+    }
+
+    public void setDate(String daTe){
+        this.daTe = daTe;
     }
 
     public User getUser(){
