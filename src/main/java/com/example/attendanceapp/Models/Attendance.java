@@ -23,6 +23,8 @@ public class Attendance {
     private String timeOut;
     @Column(nullable = false, name = "date")
     private String daTe;
+    @Column(nullable = false)
+    private Integer employeeId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -68,6 +70,14 @@ public class Attendance {
         this.daTe = daTe;
     }
 
+    public Integer getEmployeeId(){
+        return employeeId;
+    }
+
+    public void setEmployeeId(Integer employeeId){
+        this.employeeId = employeeId;
+    }
+    
     public User getUser(){
         return user;
     }
