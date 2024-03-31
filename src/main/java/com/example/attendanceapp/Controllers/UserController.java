@@ -53,9 +53,15 @@ public class UserController {
             user.setPassword(encodedPasswd);
             userRepository.save(user);
 
+            HashMap<String, Object> responseData = new HashMap<>();
             HashMap<String, String> map = new HashMap<>();
             map.put("message", "User Added Successfully");
-            return map;
+            map.put("name", user.getName());
+            map.put("email", user.getEmail());
+            map.put("address", user.getAddress());
+            map.put("employeeId", user.getEmployeeId().toString());
+            responseData.put("data", map);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
         }
     }
     @GetMapping(path = "/users")
