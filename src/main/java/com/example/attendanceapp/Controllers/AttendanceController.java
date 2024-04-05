@@ -4,14 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.attendanceapp.Models.Attendance;
@@ -78,23 +79,41 @@ public class AttendanceController {
 
     @PutMapping(path = "/time-out/{employeeId}")
     public @ResponseBody Object putTimeOut(@PathVariable Integer employeeId, @RequestBody Attendance attendanceBody) {
-        Attendance attendance = new Attendance();
+        //Attendance attendance = new Attendance();
         LocalTime localTimeNow = LocalTime.now(ZoneId.of("GMT+08:00"));
         LocalDate localDateNow = LocalDate.now(ZoneId.of("GMT+08:00"));
-        Optional<Attendance> findUserByEmpId = attendanceRepository.findByEmployeeId(employeeId);
-        Attendance attendanceRow = findUserByEmpId.get();
+        List<Attendance> findUserByEmpId = attendanceRepository.findByEmployeeIdOrderByDaTeDesc(employeeId);
+        List<Attendance> attendanceRow = findUserByEmpId;
 
-        if(attendanceRow.getDate().equals(localDateNow.toString())){
-            attendance.setTimeOut(localTimeNow.toString());
-            attendanceRepository.save(attendance);
+        try {
+            if(!attendanceRow.isEmpty()){
+                if(attendanceRow.getFirst().getDate().equals(localDateNow.toString())){
+                    attendanceRow.getFirst().setTimeOut(localTimeNow.toString());
+                    attendanceRepository.save(attendanceRow.getFirst());
+                    HashMap<String, Object> responseData = new HashMap<>();
+                    HashMap<String, String> data = new HashMap<>();
+                    data.put("data", "Attendance Time Out Success");
+                    responseData.put("data", data);
+                    return ResponseEntity.status(HttpStatus.OK).body(responseData);
+                }
+                else{
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Attendance");
+                }
+            }
+            else{
+                HashMap<String, Object> responseData = new HashMap<>();
+                HashMap<String, String> data = new HashMap<>();
+                data.put("msg", "No Attendance for Today");
+                responseData.put("data", data);
+                return ResponseEntity.status(HttpStatus.OK).body(responseData);
+            }
+        } 
+        catch(DataAccessException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        HashMap<String, Object> responseData = new HashMap<>();
-        HashMap<String, String> map = new HashMap<>();
-        map.put("name", attendanceRow.getName());
-        map.put("timeIn", attendanceRow.getTimeIn());
-        map.put("timeOut", attendance.getTimeOut());
-        responseData.put("data", map);
-        return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
         
     }
     
