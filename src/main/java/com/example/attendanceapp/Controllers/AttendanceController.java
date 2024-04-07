@@ -97,7 +97,11 @@ public class AttendanceController {
                     return ResponseEntity.status(HttpStatus.OK).body(responseData);
                 }
                 else{
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Attendance");
+                    HashMap<String, Object> responseData = new HashMap<>();
+                    HashMap<String, String> data = new HashMap<>();
+                    data.put("msg", "You already have time out for today");
+                    responseData.put("data", data);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
                 }
             }
             else{
