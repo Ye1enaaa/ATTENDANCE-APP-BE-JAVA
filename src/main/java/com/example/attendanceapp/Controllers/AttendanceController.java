@@ -41,9 +41,9 @@ public class AttendanceController {
        Attendance attendance = new Attendance();
 
        Optional<User> optionalUser = userRepository.findByEmployeeId(employeeId);
-       //Optional<Attendance> attendanceValue = attendanceRepository.findByEmployeeId(employeeId);
+       List<Attendance> attendanceValue = attendanceRepository.findByEmployeeIdOrderByDaTeDesc(employeeId);
        User user = optionalUser.get();
-       //Attendance attendanceRow = attendanceValue.get();
+       List<Attendance> attendanceRow = attendanceValue;
        LocalTime localTimeNow = LocalTime.now(ZoneId.of("GMT+08:00"));
        LocalDate localDateNow = LocalDate.now(ZoneId.of("GMT+08:00"));
        
@@ -52,6 +52,15 @@ public class AttendanceController {
         if(!optionalUser.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not Found");
            }
+
+        if(attendanceRow.getFirst().getDate().equals(localDateNow.toString())){
+            HashMap<String, Object> responseData = new HashMap<>();
+            HashMap<String, String> data = new HashMap<>();
+            data.put("msg", "You already have attendance this day");
+            data.put("val", attendanceRow.getFirst().getDate());
+            responseData.put("data", data);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
     
            attendance.setName(user.getName());
            attendance.setTimeIn(localTimeNow.toString());
