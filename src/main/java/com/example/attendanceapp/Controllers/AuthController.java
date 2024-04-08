@@ -3,8 +3,6 @@ package com.example.attendanceapp.Controllers;
 import java.util.HashMap;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,7 @@ public class AuthController {
         User user = findUsingEmail.get();
         this.passwordEncoder = new BCryptPasswordEncoder();
         boolean result = passwordEncoder.matches(credentials.getPassword(), user.getPassword());
+        int iterate = 0;
         try {
             if(!findUsingEmail.isPresent()){
                 HashMap<String, String> responseData = new HashMap<>();
@@ -43,18 +42,17 @@ public class AuthController {
             }
             
             if(user.getEmail().equals(credentials.getEmail()) && result){
+                iterate = 0;
                 return ResponseEntity.status(HttpStatus.OK).body("Login Successful");
             }
             else{
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login Unsuccessful");
+                iterate++;
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(iterate);
             }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        
-        // HashMap<String, Object> responseData = new HashMap<>();
-        // responseData.put("msg", user.getPassword());
-        // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
     }
      
 }
