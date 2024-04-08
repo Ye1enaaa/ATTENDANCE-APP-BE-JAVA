@@ -18,7 +18,7 @@ import com.example.attendanceapp.Repository.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequestMapping(path = "/api")
@@ -69,6 +69,18 @@ public class UserController {
         Iterable <User> users = userRepository.findAll();
         return users;
     }
-    
-    
+
+    @GetMapping(path = "/user/{id}")
+    public @ResponseBody Object getMyCredentials(@PathVariable Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        if(!user.isPresent()){
+            HashMap<String, String> responseData = new HashMap<>();
+            responseData.put("msg", "No User was Found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }else{
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("data", user);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        }
+    }
 }
