@@ -41,7 +41,7 @@ public class AuthController {
     //private SecretKey secretKey = JwtUtils.generateSecretKey();
     //private static final long JWT_EXPIRATION_MS = 86400000;
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = "/auth/login")
     public @ResponseBody ResponseEntity<?> logIn(@RequestBody User credentials) {
         Optional<User> findUsingEmail = userRepository.findByEmail(credentials.getEmail());
         var accessToken = jwtIssuer.issue(1, credentials.getEmail());
