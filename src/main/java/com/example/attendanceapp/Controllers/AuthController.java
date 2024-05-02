@@ -34,7 +34,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private SecretKey secretKey = JwtUtils.generateSecretKey();
-    private static final long JWT_EXPIRATION_MS = 86400000; // 1 day
+    private static final long JWT_EXPIRATION_MS = 86400000;
 
     @PostMapping(path = "/login")
     public @ResponseBody ResponseEntity<?> logIn(@RequestBody User credentials) {
@@ -60,7 +60,7 @@ public class AuthController {
         }
     }
 
-    private String generateJwtToken(String email) {
+    public String generateJwtToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_MS))
