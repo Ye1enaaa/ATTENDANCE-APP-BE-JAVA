@@ -1,17 +1,11 @@
 package com.example.attendanceapp.Controllers;
 
-//import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -19,26 +13,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.attendanceapp.Models.User;
-//import com.example.attendanceapp.Providers.JwtTokenProvider;
 import com.example.attendanceapp.Repository.UserRepository;
-//import com.example.attendanceapp.UTILS.JwtUtils;
 import com.example.attendanceapp.Security.JwtIssuer;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
-
-//import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Controller
+@RequestMapping(path = "/v1")
 public class UserController {
     @Autowired
     private JwtIssuer jwtIssuer;
@@ -47,9 +33,6 @@ public class UserController {
     private UserRepository userRepository;
 
     PasswordEncoder passwordEncoder;
-
-    
-    //private SecretKey secretKey = JwtUtils.generateSecretKey();
 
     @PostMapping(path = "/add/user")
     public @ResponseBody Object addUser(@RequestBody User userBody) {
@@ -93,6 +76,20 @@ public class UserController {
         return users;
     }
 
+    @GetMapping(path="/**")
+    public @ResponseBody Object handleV1Requests(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/v1/")) {
+            String token = resolveToken(request);
+            if (!token.isEmpty()) {
+                System.out.println(token); 
+                return getMyCredentials(request);
+            }
+            return null;
+        } else {
+            return null;
+        }
+    }
    
     @GetMapping(path="/user")
     public @ResponseBody Object getMyCredentials(HttpServletRequest request) {
@@ -105,9 +102,18 @@ public class UserController {
         try {
             DecodedJWT decodedJWT = jwtIssuer.validateAndDecode(token);
             System.out.println(decodedJWT.getPayload()); 
-            String userId = decodedJWT.getSubject();
             String email = decodedJWT.getClaim("email").asString();
-            return ResponseEntity.status(HttpStatus.OK).body("User ID: " + userId + ", Email: " + email);
+            Optional<User> findByEmailOptional = userRepository.findByEmail(email);
+            HashMap<String, Object> responseValues = new HashMap<>();
+            HashMap<String, String> responseData = new HashMap<>();
+            if(findByEmailOptional.isPresent()){
+                System.out.println(findByEmailOptional);
+                responseData.put("email", email);
+                responseValues.put("values", findByEmailOptional);
+                return ResponseEntity.status(HttpStatus.OK).body(responseValues);
+            }else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorize Access");
+            }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
