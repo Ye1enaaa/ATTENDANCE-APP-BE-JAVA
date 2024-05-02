@@ -20,9 +20,11 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequestMapping(path = "/v1")
 public class UserController {
     @Autowired
     private JwtIssuer jwtIssuer;
@@ -74,6 +76,20 @@ public class UserController {
         return users;
     }
 
+    @GetMapping(path="/**")
+    public @ResponseBody Object handleV1Requests(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/v1/")) {
+            String token = resolveToken(request);
+            if (!token.isEmpty()) {
+                System.out.println(token); 
+                return getMyCredentials(request);
+            }
+            return null;
+        } else {
+            return null;
+        }
+    }
    
     @GetMapping(path="/user")
     public @ResponseBody Object getMyCredentials(HttpServletRequest request) {
