@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,7 +34,6 @@ public class AuthController {
 
     @Autowired
     private JwtIssuer jwtIssuer;
-
     @PostMapping(path = "/auth/login")
     public @ResponseBody ResponseEntity<?> logIn(@RequestBody User credentials, HttpServletResponse response) {
         Optional<User> findUsingEmail = userRepository.findByEmail(credentials.getEmail());
