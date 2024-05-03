@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@RequestMapping(path = "/v1")
+@RequestMapping(path = "/user")
 public class UserController {
     @Autowired
     private JwtIssuer jwtIssuer;
@@ -76,25 +76,11 @@ public class UserController {
         return users;
     }
 
-    @GetMapping(path="/**")
-    public @ResponseBody Object handleV1Requests(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/v1/")) {
-            String token = resolveToken(request);
-            if (!token.isEmpty()) {
-                System.out.println(token); 
-                return getMyCredentials(request);
-            }
-            return null;
-        } else {
-            return null;
-        }
-    }
    
-    @GetMapping(path="/user")
+    @GetMapping(path="/credentials")
     public @ResponseBody Object getMyCredentials(HttpServletRequest request) {
         String token = resolveToken(request);
-        if (token == null) {
+        if (token.isEmpty()) {
             System.out.println("No token"); 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token provided");
         }
@@ -120,7 +106,7 @@ public class UserController {
     }
     
 
-    private String resolveToken(HttpServletRequest request) {
+    public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7); 
