@@ -37,10 +37,11 @@ public class SecurityConfig{
             .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests((request)-> request
                 .requestMatchers("/**").permitAll()
-                .requestMatchers("/v1/**").permitAll()
-                .requestMatchers("/users").permitAll()
+                //.requestMatchers("/user/**").permitAll()
+                //.requestMatchers("/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/create-attendance/*").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/time-out/*").permitAll()
                 .requestMatchers(HttpMethod.GET).hasAuthority("read")
                 .requestMatchers(HttpMethod.POST).hasAuthority("write")
                 .anyRequest().authenticated())

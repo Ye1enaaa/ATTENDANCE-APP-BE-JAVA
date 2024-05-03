@@ -15,7 +15,7 @@ import ch.qos.logback.core.util.Duration;
 
 @Component
 public class JwtIssuer {
-    private static final String SECRET = "secret";
+    private static final String SECRET = "secretraniparabibohahahahaha";
 
     public DecodedJWT validateAndDecode(String token){
         try{
