@@ -33,8 +33,6 @@ public class AuthController {
 
     @Autowired
     private JwtIssuer jwtIssuer;
-    //private SecretKey secretKey = JwtUtils.generateSecretKey();
-    //private static final long JWT_EXPIRATION_MS = 86400000;
 
     @PostMapping(path = "/auth/login")
     public @ResponseBody ResponseEntity<?> logIn(@RequestBody User credentials, HttpServletResponse response) {
