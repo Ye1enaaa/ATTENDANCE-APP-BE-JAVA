@@ -16,12 +16,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.attendanceapp.Models.Attendance;
 import com.example.attendanceapp.Models.User;
+import com.example.attendanceapp.Providers.PayloadProviders;
 import com.example.attendanceapp.Repository.AttendanceRepository;
 import com.example.attendanceapp.Repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -33,6 +38,12 @@ public class AttendanceController {
     
     @Autowired
     private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private UserController userController;
+
+    @Autowired
+    private PayloadProviders payloadProviders;
 
     @PostMapping(path = "/create-attendance/{employeeId}")
     public @ResponseBody Object createAttendance(@PathVariable Integer employeeId, @RequestBody Attendance attendanceBody) {
@@ -126,6 +137,27 @@ public class AttendanceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
         
+    }
+
+    @GetMapping(path = "/user/attendance")
+    public @ResponseBody Object fetchUserAttendance(HttpServletRequest request){
+        String token = userController.resolveToken(request);
+        if(token.isEmpty() || token == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No token");
+        }
+        Object payloadCredentials = payloadProviders.userCredentialsPayloadProviders(token);
+        if(payloadCredentials instanceof User){
+            User user = (User) payloadCredentials;
+            Integer employeeId = user.getEmployeeId();
+            List <Attendance> attendanceArray = attendanceRepository.findByEmployeeIdOrderByDaTeDesc(employeeId);
+        
+            if(attendanceArray.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No attendance!");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(attendanceArray);
+        }
+
+        return null;
     }
     
 }
